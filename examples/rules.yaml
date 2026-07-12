@@ -1,0 +1,114 @@
+# ============================================================================
+# edge-mining-framework — prediction-market trading rules
+# ============================================================================
+# Each rule under `rules:` has two parts:
+#   signal:  a list of conditions evaluated by FeatureEvaluator.evaluate_compound
+#            (scalar operators: == != > < >= <= in_range in_set;
+#             series operators: crosses_above crosses_below zscore rolling_corr rank)
+#   trade:   parameters fed to ExpectedValueGate.calculate_ev_metrics to produce
+#            continuous EV + Kelly fraction + recommended size.
+#
+# `win_prob` is your model's estimated probability of the contract resolving
+# true. `price_cents` is what you pay per $1.00 contract (Kalshi/Polymarket
+# quote * 100). `fee_pct` is the exchange taker fee. `bankroll` is your
+# account equity in dollars (recommended_size is reported in those units).
+# ============================================================================
+
+rules:
+  # --- Rule 1: classic mean-reversion entry ----------------------------------
+  - name: "RSI oversold + volatility expansion"
+    description: >
+      Buy the YES contract when the underlying's RSI reads oversold (<30)
+      and realized volatility has just expanded (vol_expansion flag set).
+      Expansion on an oversold print tends to mark capitulation.
+    signal:
+      - feature: rsi
+        operator: "<"
+        threshold: 30
+      - feature: vol_expansion
+        operator: "=="
+        threshold: true
+    trade:
+      win_prob: 0.58
+      price_cents: 42
+      payout_cents: 100
+      fee_pct: 0.04
+      bankroll: 1000.0
+
+  # --- Rule 2: trend-follow on a moving-average cross -------------------------
+  - name: "Price crosses above 50-period MA with volume confirmation"
+    description: >
+      Take the YES side when the price series crosses above its 50-period
+      moving average AND a volume spike confirms participation. Demonstrates
+      the crosses_above series operator.
+    signal:
+      - feature: price
+        operator: "crosses_above"
+        threshold: 50        # crossed above its own 50-pt trailing mean
+      - feature: volume_spike
+        operator: "=="
+        threshold: true
+    trade:
+      win_prob: 0.57
+      price_cents: 48
+      payout_cents: 100
+      fee_pct: 0.04
+      bankroll: 1000.0
+
+  # --- Rule 3: momentum breakout gated by a mean-reversion filter ------------
+  - name: "Momentum z-score breakout, filtered by neutral RSI"
+    description: >
+      Fire only when the price's short-horizon z-score exceeds 2.0 (real
+      momentum, not noise) AND the RSI sits in a neutral band [40,60] so we
+      are not buying an already-extended, overbought print.
+    signal:
+      - feature: momentum_z
+        operator: "zscore"
+        threshold: 2.0
+      - feature: rsi
+        operator: "in_range"
+        threshold: [40, 60]
+    trade:
+      win_prob: 0.60
+      price_cents: 50
+      payout_cents: 100
+      fee_pct: 0.04
+      bankroll: 1000.0
+
+  # --- Rule 4: cross-market correlation confirmation --------------------------
+  - name: "Correlated sister-market confirms direction"
+    description: >
+      Trade the YES contract only when our market's recent returns are
+      strongly positively correlated (>= 0.8 over the last 20 periods) with
+      a correlated sister market that has already moved. Demonstrates
+      rolling_corr across two series.
+    signal:
+      - feature: market_ret
+        operator: "rolling_corr"
+        threshold:
+          other: sister_ret
+          window: 20
+          min_corr: 0.8
+    trade:
+      win_prob: 0.55
+      price_cents: 45
+      payout_cents: 100
+      fee_pct: 0.04
+      bankroll: 1000.0
+
+  # --- Rule 5: fade extreme implied probability -------------------------------
+  - name: "Fade extreme implied probability (rank filter)"
+    description: >
+      When the current implied probability ranks in the top 10% of its own
+      recent history (i.e. the crowd has pushed it to an extreme), take the
+      NO side — fade the euphoria. Demonstrates the rank series operator.
+    signal:
+      - feature: implied_prob
+        operator: "rank"
+        threshold: 0.9
+    trade:
+      win_prob: 0.53          # NO side: crowd overpriced YES
+      price_cents: 47         # paying 47c for a NO that wins 53% of the time
+      payout_cents: 100
+      fee_pct: 0.04
+      bankroll: 1000.0
