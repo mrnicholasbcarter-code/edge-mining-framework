@@ -1,0 +1,47 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+
+repos:
+  # Code formatting and linting
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.5.7
+    hooks:
+      - id: ruff
+        args: [--fix, --exit-non-zero-on-fix]
+      - id: ruff-format
+        args: [--check]
+
+  # Pre-commit hooks for Python
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-toml
+      - id: check-json
+      - id: check-merge-conflict
+      - id: check-added-large-files
+      - id: debug-logger
+      - id: detect-private-key
+
+  # Docstring style checking
+  - repo: https://github.com/pycqa/pydocstyle
+    rev: 6.4.0
+    hooks:
+      - id: pydocstyle
+        args: [--convention=google, --add-ignore=D100,D101,D102,D103,D104,D105,D106,D107,D203,D205,D212,D213,D400,D401,D415]
+
+  # Security scanning
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.8.2
+    hooks:
+      - id: bandit
+        args: [-r, src/, -ll, -q]
+
+  # Check for secrets
+  - repo: https://github.com/trufflesecurity/trufflehog
+    rev: v3.81.0
+    hooks:
+      - id: trufflehog
+        args: [--no-update, --fail, git, file://., --since-commit, HEAD]
