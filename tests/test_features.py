@@ -78,3 +78,60 @@ class TestEvaluateCompound:
         rules = [{"feature": "rsi", "threshold": 40.0}]
         with pytest.raises(KeyError, match="operator"):
             FeatureEvaluator.evaluate_compound(features, rules)
+
+    def test_all_rules_fail(self):
+        features = {"rsi": 70.0, "volume_spike": False}
+        rules = [
+            {"feature": "rsi", "operator": "<", "threshold": 40.0},
+            {"feature": "volume_spike", "operator": "==", "threshold": True}
+        ]
+        assert FeatureEvaluator.evaluate_compound(features, rules) is False
+
+    def test_multiple_rules_all_pass(self):
+        features = {"rsi": 30.0, "volume_spike": True, "price_action": "bullish"}
+        rules = [
+            {"feature": "rsi", "operator": "<", "threshold": 40.0},
+            {"feature": "volume_spike", "operator": "==", "threshold": True},
+            {"feature": "price_action", "operator": "==", "threshold": "bullish"}
+        ]
+        assert FeatureEvaluator.evaluate_compound(features, rules) is True
+
+    def test_middle_rule_fails(self):
+        features = {"rsi": 30.0, "volume_spike": False, "price_action": "bullish"}
+        rules = [
+            {"feature": "rsi", "operator": "<", "threshold": 40.0},
+            {"feature": "volume_spike", "operator": "==", "threshold": True},
+            {"feature": "price_action", "operator": "==", "threshold": "bullish"}
+        ]
+        assert FeatureEvaluator.evaluate_compound(features, rules) is False
+
+    def test_last_rule_fails(self):
+        features = {"rsi": 30.0, "volume_spike": True, "price_action": "bearish"}
+        rules = [
+            {"feature": "rsi", "operator": "<", "threshold": 40.0},
+            {"feature": "volume_spike", "operator": "==", "threshold": True},
+            {"feature": "price_action", "operator": "==", "threshold": "bullish"}
+        ]
+        assert FeatureEvaluator.evaluate_compound(features, rules) is False
+
+    def test_missing_threshold_raises_keyerror(self):
+        features = {"rsi": 30.5}
+        rules = [{"feature": "rsi", "operator": "=="}]
+        with pytest.raises(KeyError, match="threshold"):
+            FeatureEvaluator.evaluate_compound(features, rules)
+
+    def test_missing_feature_and_threshold_raises_keyerror(self):
+        features = {"rsi": 30.5}
+        rules = [{"feature": "missing", "operator": "=="}]
+        # Missing feature returns False (not an error)
+        assert FeatureEvaluator.evaluate_compound(features, rules) is False
+
+    def test_single_rule_passes(self):
+        features = {"rsi": 30.0}
+        rules = [{"feature": "rsi", "operator": "<", "threshold": 40.0}]
+        assert FeatureEvaluator.evaluate_compound(features, rules) is True
+
+    def test_single_rule_fails(self):
+        features = {"rsi": 70.0}
+        rules = [{"feature": "rsi", "operator": "<", "threshold": 40.0}]
+        assert FeatureEvaluator.evaluate_compound(features, rules) is False
