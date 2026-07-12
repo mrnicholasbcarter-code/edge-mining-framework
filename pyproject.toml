@@ -7,21 +7,36 @@ name = "edge-mining-framework"
 version = "0.1.0"
 description = "Prediction Market Alpha Engine"
 readme = "README.md"
+license = {text = "MIT"}
 requires-python = ">=3.10"
-dependencies = []
+authors = [{name = "Nicholas Carter"}]
+keywords = ["prediction-markets", "alpha", "signal-evaluation", "expected-value"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Office/Business :: Financial",
+]
 
 [project.optional-dependencies]
-dev = ["pytest", "pytest-cov"]
+dev = ["pytest>=8.0", "pytest-cov>=4.1", "ruff>=0.8", "mypy>=1.13"]
 
-[tool.hatch.build.targets.wheel]
-packages = ["src/edge_mining_framework"]
+[project.urls]
+Homepage = "https://github.com/mrnicholasbcarter-code/edge-mining-framework"
+Repository = "https://github.com/mrnicholasbcarter-code/edge-mining-framework"
+Issues = "https://github.com/mrnicholasbcarter-code/edge-mining-framework/issues"
 
 [tool.ruff]
 line-length = 100
 target-version = "py310"
 select = ["E", "F", "I", "N", "W", "UP", "B", "SIM", "RUF"]
 ignore = ["E501", "B008"]
-per-file-ignores = ["tests/*": "S101"]
+per-file-ignores = { "tests/*" = "S101" }
 
 [tool.ruff.format]
 quote-style = "double"
@@ -31,3 +46,13 @@ line-ending = "lf"
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
