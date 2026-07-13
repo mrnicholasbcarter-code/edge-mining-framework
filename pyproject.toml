@@ -10,6 +10,7 @@ readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.10"
 authors = [{name = "Nicholas Carter"}]
+dependencies = ["numpy>=1.24"]
 keywords = ["prediction-markets", "alpha", "signal-evaluation", "expected-value"]
 classifiers = [
     "Development Status :: 3 - Alpha",
@@ -25,6 +26,7 @@ classifiers = [
 
 [project.optional-dependencies]
 dev = ["pytest>=8.0", "pytest-asyncio>=0.24", "pytest-cov>=4.1", "ruff>=0.8", "mypy>=1.13"]
+release = ["build>=1.2", "twine>=5.0"]
 
 [project.urls]
 Homepage = "https://github.com/mrnicholasbcarter-code/edge-mining-framework"
