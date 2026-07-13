@@ -16,3 +16,4 @@ patch_*.py
 *.bak
 .env
 .DS_Store
+.coverage
