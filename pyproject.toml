@@ -24,7 +24,7 @@ classifiers = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=8.0", "pytest-cov>=4.1", "ruff>=0.8", "mypy>=1.13"]
+dev = ["pytest>=8.0", "pytest-asyncio>=0.24", "pytest-cov>=4.1", "ruff>=0.8", "mypy>=1.13"]
 
 [project.urls]
 Homepage = "https://github.com/mrnicholasbcarter-code/edge-mining-framework"
