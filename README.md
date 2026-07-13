@@ -2,10 +2,10 @@
   <h1>Edge Mining Framework</h1>
   <p><strong>Agnostic Signal Feature Evaluator and EV Payout Gating Engine</strong></p>
   <p>
-    <a href="https://github.com/nick/edge-mining-framework/actions"><img src="https://img.shields.io/badge/build-passing-brightgreen" alt="Build Status" /></a>
-    <a href="https://codecov.io/gh/nick/edge-mining-framework"><img src="https://img.shields.io/badge/coverage-100%25-success" alt="Code Coverage" /></a>
+    <a href="https://github.com/mrnicholasbcarter-code/edge-mining-framework/actions"><img src="https://img.shields.io/badge/build-passing-brightgreen" alt="Build Status" /></a>
+    <a href="https://codecov.io/gh/mrnicholasbcarter-code/edge-mining-framework"><img src="https://img.shields.io/badge/tests-39-passing-blue" alt="Code Coverage" /></a>
     <a href="https://pypi.org/project/edge-mining-framework"><img src="https://img.shields.io/pypi/pyversions/edge-mining-framework" alt="Python Versions" /></a>
-    <a href="https://github.com/nick/edge-mining-framework/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="License" /></a>
+    <a href="https://github.com/mrnicholasbcarter-code/edge-mining-framework/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="License" /></a>
   </p>
 </div>
 
@@ -96,7 +96,7 @@ Let:
 - $Y$ = contract payout in cents (default is $100$)
 - $F_{\text{pct}}$ = exchange fee percentage (default is $0.07$ for a $7\%$ fee structure)
 
-The mathematical steps calculated in [ExpectedValueGate.calculate_ev_metrics](file:///home/nick/edge-mining-framework/src/edge_mining_framework/gate.py#L78-L161) are:
+The mathematical steps calculated in [ExpectedValueGate.calculate_ev_metrics](src/edge_mining_framework/gate.py#L78-L161) are:
 
 $$\text{Gross Profit} = Y - C$$
 
@@ -139,7 +139,7 @@ pip install edge-mining-framework
 
 ### From Source (Development)
 ```bash
-git clone https://github.com/nick/edge-mining-framework.git
+git clone https://github.com/mrnicholasbcarter-code/edge-mining-framework.git
 cd edge-mining-framework
 pip install -e .
 ```
@@ -200,7 +200,7 @@ if FeatureEvaluator.evaluate_compound(features, rules):
 
 ### 3. EV Gate & Kelly Capital Allocation
 
-Route your signal trigger into risk management using [ExpectedValueGate.calculate_ev_metrics](file:///home/nick/edge-mining-framework/src/edge_mining_framework/gate.py#L78-L161):
+Route your signal trigger into risk management using [ExpectedValueGate.calculate_ev_metrics](src/edge_mining_framework/gate.py#L78-L161):
 
 ```python
 from edge_mining_framework import ExpectedValueGate
@@ -284,7 +284,7 @@ Data leakage is the most common pitfall in algorithmic trading. The Edge Mining 
 - All series calculations (e.g. `crosses_above`, `zscore`, `rank`) are performed relative to the **final index** of the provided sequence (`series[-1]` and `series[-2]`).
 - **Developer Contract**: To evaluate signals at timestamp $T$, the caller **must** slice all historical series to only include data points up to $T$ (i.e. `series[:T+1]`). Passing future data points (e.g., $T+1$) will cause leakage.
 
-Refer to the properties defined in [test_anti_lookahead.py](file:///home/nick/edge-mining-framework/tests/test_anti_lookahead.py) for structural verification.
+Refer to the properties defined in [test_anti_lookahead.py](tests/test_anti_lookahead.py) for structural verification.
 
 ---
 
@@ -325,4 +325,4 @@ We welcome contributions to the Edge Mining Framework! Please adhere to the foll
 
 ## License
 
-This project is licensed under the MIT License. See [LICENSE](file:///home/nick/edge-mining-framework/LICENSE) for more information.
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for more information.
