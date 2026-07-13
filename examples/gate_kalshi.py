@@ -15,16 +15,16 @@ from edge_mining_framework import ExpectedValueGate
 def main() -> None:
     """Run two Kalshi trade scenarios through the EV gate."""
     # Kalshi fee = 4 cents per $1 contract (typical as of 2024)
-    KALSHI_FEE = 0.04
-    PAYOUT = 100  # cents per contract (fixed)
+    kalshi_fee = 0.04
+    payout = 100  # cents per contract (fixed)
 
     # NEGATIVE-EV trade (should be REJECTED)
     # 48% win probability implies the YES side is overpriced; EV is negative.
     neg_ev = ExpectedValueGate.calculate_ev_metrics(
         predicted_win_prob=0.48,
         current_contract_price_cents=48,  # priced at ~48c on a fair 48% outcome
-        payout_cents=PAYOUT,
-        exchange_fee_pct=KALSHI_FEE,
+        payout_cents=payout,
+        exchange_fee_pct=kalshi_fee,
         bankroll=500.0,
     )
 
@@ -42,8 +42,8 @@ def main() -> None:
     pos_ev = ExpectedValueGate.calculate_ev_metrics(
         predicted_win_prob=0.57,
         current_contract_price_cents=48,  # market is underpricing this outcome
-        payout_cents=PAYOUT,
-        exchange_fee_pct=KALSHI_FEE,
+        payout_cents=payout,
+        exchange_fee_pct=kalshi_fee,
         bankroll=500.0,
     )
 

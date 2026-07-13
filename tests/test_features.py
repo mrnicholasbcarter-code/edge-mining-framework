@@ -1,4 +1,5 @@
 import pytest
+
 from edge_mining_framework.evaluator import FeatureEvaluator
 
 
@@ -41,7 +42,7 @@ class TestEvaluateCompound:
         features = {"rsi": 30.5, "volume_spike": True}
         rules = [
             {"feature": "rsi", "operator": "<", "threshold": 40.0},
-            {"feature": "volume_spike", "operator": "==", "threshold": True}
+            {"feature": "volume_spike", "operator": "==", "threshold": True},
         ]
         assert FeatureEvaluator.evaluate_compound(features, rules) is True
 
@@ -49,7 +50,7 @@ class TestEvaluateCompound:
         features = {"rsi": 50.0, "volume_spike": True}
         rules = [
             {"feature": "rsi", "operator": "<", "threshold": 40.0},
-            {"feature": "volume_spike", "operator": "==", "threshold": True}
+            {"feature": "volume_spike", "operator": "==", "threshold": True},
         ]
         assert FeatureEvaluator.evaluate_compound(features, rules) is False
 
@@ -66,7 +67,7 @@ class TestEvaluateCompound:
         rules = [{}]
         with pytest.raises(KeyError, match="feature"):
             FeatureEvaluator.evaluate_compound(features, rules)
-            
+
     def test_invalid_operator_in_compound(self):
         features = {"rsi": 30.5}
         rules = [{"feature": "rsi", "operator": "INVALID_OP", "threshold": 40.0}]
@@ -83,7 +84,7 @@ class TestEvaluateCompound:
         features = {"rsi": 70.0, "volume_spike": False}
         rules = [
             {"feature": "rsi", "operator": "<", "threshold": 40.0},
-            {"feature": "volume_spike", "operator": "==", "threshold": True}
+            {"feature": "volume_spike", "operator": "==", "threshold": True},
         ]
         assert FeatureEvaluator.evaluate_compound(features, rules) is False
 
@@ -92,7 +93,7 @@ class TestEvaluateCompound:
         rules = [
             {"feature": "rsi", "operator": "<", "threshold": 40.0},
             {"feature": "volume_spike", "operator": "==", "threshold": True},
-            {"feature": "price_action", "operator": "==", "threshold": "bullish"}
+            {"feature": "price_action", "operator": "==", "threshold": "bullish"},
         ]
         assert FeatureEvaluator.evaluate_compound(features, rules) is True
 
@@ -101,7 +102,7 @@ class TestEvaluateCompound:
         rules = [
             {"feature": "rsi", "operator": "<", "threshold": 40.0},
             {"feature": "volume_spike", "operator": "==", "threshold": True},
-            {"feature": "price_action", "operator": "==", "threshold": "bullish"}
+            {"feature": "price_action", "operator": "==", "threshold": "bullish"},
         ]
         assert FeatureEvaluator.evaluate_compound(features, rules) is False
 
@@ -110,7 +111,7 @@ class TestEvaluateCompound:
         rules = [
             {"feature": "rsi", "operator": "<", "threshold": 40.0},
             {"feature": "volume_spike", "operator": "==", "threshold": True},
-            {"feature": "price_action", "operator": "==", "threshold": "bullish"}
+            {"feature": "price_action", "operator": "==", "threshold": "bullish"},
         ]
         assert FeatureEvaluator.evaluate_compound(features, rules) is False
 

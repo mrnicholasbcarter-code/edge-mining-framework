@@ -39,7 +39,6 @@ Example:
 """
 
 from dataclasses import dataclass
-from typing import Optional
 
 
 @dataclass(frozen=True)
@@ -108,18 +107,14 @@ class ExpectedValueGate:
             5.83
         """
         if not 0.0 <= predicted_win_prob <= 1.0:
-            raise ValueError(
-                f"predicted_win_prob must be in [0, 1], got {predicted_win_prob}"
-            )
+            raise ValueError(f"predicted_win_prob must be in [0, 1], got {predicted_win_prob}")
         if not 0 <= current_contract_price_cents <= payout_cents:
             raise ValueError(
                 f"current_contract_price_cents must be in [0, {payout_cents}], "
                 f"got {current_contract_price_cents}"
             )
         if exchange_fee_pct < 0:
-            raise ValueError(
-                f"exchange_fee_pct must be non-negative, got {exchange_fee_pct}"
-            )
+            raise ValueError(f"exchange_fee_pct must be non-negative, got {exchange_fee_pct}")
         if bankroll < 0:
             raise ValueError(f"bankroll must be non-negative, got {bankroll}")
 
@@ -132,9 +127,7 @@ class ExpectedValueGate:
         loss_if_lose = cost  # positive magnitude; payout 0, you lose cost
 
         # EV in cents per trade.
-        expected_value = (
-            predicted_win_prob * net_profit_if_win
-        ) - (
+        expected_value = (predicted_win_prob * net_profit_if_win) - (
             (1.0 - predicted_win_prob) * loss_if_lose
         )
 
@@ -143,11 +136,8 @@ class ExpectedValueGate:
         # Simpler equivalent for a binary bet with profit `b` and loss `a`:
         #   f* = (p * b - q * a) / b   (here a==cost, b==net_profit_if_win)
         # Which equals expected_value / net_profit_if_win.
-        if net_profit_if_win > 0:
-            kelly = expected_value / net_profit_if_win
-        else:
-            # No positive payoff possible; never bet.
-            kelly = 0.0
+        # No positive payoff is possible when the denominator is non-positive.
+        kelly = expected_value / net_profit_if_win if net_profit_if_win > 0 else 0.0
 
         # Clamp to a long-only fraction [0, 1]: negative EV -> 0, extreme edge -> 1.
         kelly_fraction = max(0.0, min(1.0, kelly))

@@ -9,12 +9,11 @@ Usage:
 
 from __future__ import annotations
 
-import yaml
 from pathlib import Path
 
-import numpy as np
-from edge_mining_framework import FeatureEvaluator, ExpectedValueGate
+import yaml
 
+from edge_mining_framework import ExpectedValueGate, FeatureEvaluator
 
 # Sample feature data for live inspection. The series are intentionally
 # varied to demonstrate scalar and series operators.
@@ -72,8 +71,10 @@ def main() -> None:
         print(f"\n--- Rule: {name} ---\n")
         print(f"  Signal: {description}")
         print(f"  Conditions met: {passed}")
-        print(f"  Trade params: win_prob={trade['win_prob']}, price={trade['price_cents']}c, "
-              f"fee={trade['fee_pct']*100}%")
+        print(
+            f"  Trade params: win_prob={trade['win_prob']}, price={trade['price_cents']}c, "
+            f"fee={trade['fee_pct'] * 100}%"
+        )
         print(f"  EV (cents/trade):     {ev.expected_value:.2f}")
         print(f"  Kelly fraction:       {ev.kelly_fraction:.4f}")
         print(f"  Recommended size:       ${ev.recommended_size:.2f}")

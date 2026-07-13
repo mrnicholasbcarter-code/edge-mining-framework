@@ -8,6 +8,7 @@ This is a critical test for any trading framework to prevent data leakage.
 
 import numpy as np
 import pytest
+
 from edge_mining_framework import FeatureEvaluator
 
 
@@ -47,7 +48,6 @@ def test_no_lookahead_in_zscore():
     assert result_t is True
 
     # Extend the series with another outlier at T+1
-    series_t1 = [1.0, 1.0, 1.0, 1.0, 5.0, 6.0]
     # If we're evaluating "at T" (the 5th element, index 4), the series available
     # should only include up to index 4. But the function receives the whole list.
     # The key property: the z-score at index 4 must be the SAME regardless of
@@ -56,12 +56,7 @@ def test_no_lookahead_in_zscore():
     # So we must ensure the caller only passes data up to T.
     # This test documents the CONTRACT: callers must truncate series to T.
     # We verify the function is deterministic given the same prefix.
-    result_prefix = FeatureEvaluator.evaluate_rule(
-        series_t, "zscore", 1.5
-    )
-    result_full = FeatureEvaluator.evaluate_rule(
-        series_t1, "zscore", 1.5
-    )
+    result_prefix = FeatureEvaluator.evaluate_rule(series_t, "zscore", 1.5)
     # They SHOULD differ because mean/std change with the extra point.
     # The anti-lookahead guarantee is the CALLER'S responsibility:
     # only pass [:T+1] to evaluate at T.
@@ -83,10 +78,6 @@ def test_no_lookahead_in_rolling_corr():
     assert result_t is True  # High correlation
 
     # Add a decorrelating point at T+1
-    market_t1 = market + [0.05]
-    sister_t1 = sister + [-0.05]
-    features_t1 = {"series": {"market": market_t1, "sister": sister_t1}}
-
     # If implementation peeks at T+1, correlation at T would be wrong.
     # Our implementation only looks at the last `window` elements.
     # So the result at T with 6 elements should equal the result with 7 elements
@@ -94,9 +85,11 @@ def test_no_lookahead_in_rolling_corr():
     # The FUNCTION receives the full series; the caller must slice.
     # We verify the caller-sliced version gives correct result.
     result_sliced = FeatureEvaluator.evaluate_rule(
-        market[:6], "rolling_corr", threshold,
+        market[:6],
+        "rolling_corr",
+        threshold,
         features={"series": {"market": market[:6], "sister": sister[:6]}},
-        feat_name="market"
+        feat_name="market",
     )
     assert result_sliced is True
 
@@ -110,7 +103,6 @@ def test_no_lookahead_in_rank():
 
     # If we add a higher value at T+1, rank at T should NOT change
     # (assuming caller passes only [:5] for evaluation at T)
-    series_t1 = [0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
     # The function's output for the 6-element list is different (rank of 1.0 = 1.0)
     # But if caller passes series_t (5 elements) for T=4, rank is computed correctly.
     # This test documents the CONTRACT.
@@ -131,7 +123,7 @@ def test_feature_evaluator_compound_no_lookahead():
     assert result_t is False  # No cross at T
 
     # At T+1 (index 5), cross happens
-    features_t1 = {"series": {"price": series + [101]}}
+    features_t1 = {"series": {"price": [*series, 101]}}
     result_t1 = FeatureEvaluator.evaluate_compound(features_t1, rules)
     assert result_t1 is True  # Cross at T+1
 
@@ -147,9 +139,7 @@ def test_anti_lookahead_property_caller_must_slice():
     threshold = 12
 
     # Evaluation at T=4 with exactly 5 elements (indices 0..4)
-    result_at_t = FeatureEvaluator.evaluate_rule(
-        base_series, "crosses_above", threshold
-    )
+    result_at_t = FeatureEvaluator.evaluate_rule(base_series, "crosses_above", threshold)
     assert result_at_t is True
 
     # If we (wrongly) passed 6 elements where the cross already happened at T-1
@@ -160,12 +150,8 @@ def test_anti_lookahead_property_caller_must_slice():
     # the LAST index of whatever you pass.
     # The test here is: the answer for the PREFIX is stable.
     future_series = np.array([10, 11, 9, 12, 13, 14, 15])
-    result_prefix = FeatureEvaluator.evaluate_rule(
-        base_series, "crosses_above", threshold
-    )
-    result_full = FeatureEvaluator.evaluate_rule(
-        future_series, "crosses_above", threshold
-    )
+    result_prefix = FeatureEvaluator.evaluate_rule(base_series, "crosses_above", threshold)
+    result_full = FeatureEvaluator.evaluate_rule(future_series, "crosses_above", threshold)
     # The property: caller must pass base_series for T=4, future_series for T=6.
     # This test just documents the requirement.
     assert result_prefix is True

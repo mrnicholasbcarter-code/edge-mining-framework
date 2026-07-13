@@ -62,13 +62,13 @@ Architecture:
 """
 
 import operator
-from typing import Any, Callable, Dict, Sequence, Union
+from collections.abc import Callable, Sequence
+from typing import Any
 
 import numpy as np
 
-
 # O(1) operator dispatch table - avoids eval() for safety and performance
-OPERATORS: Dict[str, Callable] = {
+OPERATORS: dict[str, Callable[[Any, Any], Any]] = {
     "==": operator.eq,
     "!=": operator.ne,
     ">": operator.gt,
@@ -80,7 +80,7 @@ OPERATORS: Dict[str, Callable] = {
 SERIES_OPERATORS = {"crosses_above", "crosses_below", "zscore", "rolling_corr", "rank"}
 
 
-def _resolve_series(features: Dict[str, Any], feat_name: str) -> np.ndarray:
+def _resolve_series(features: dict[str, Any], feat_name: str) -> np.ndarray:
     """Resolve a series value for a series operator.
 
     Accepts either an inline list under features[feat_name] or a namespaced
@@ -129,9 +129,7 @@ def _op_zscore(series: np.ndarray, threshold: float) -> bool:
     return bool(z >= threshold)
 
 
-def _op_rolling_corr(
-    series: np.ndarray, threshold: float, other: np.ndarray
-) -> bool:
+def _op_rolling_corr(series: np.ndarray, threshold: float, other: np.ndarray) -> bool:
     """True if |corr(last `window` of series, last `window` of other)| >=
     threshold. ``window`` is read from the threshold dict; threshold itself
     is the minimum |corr| gate.
@@ -141,7 +139,6 @@ def _op_rolling_corr(
         raise ValueError(
             "rolling_corr threshold must be a dict with 'other', 'window', and 'min_corr'"
         )
-    other_name = threshold["other"]
     window = int(threshold["window"])
     min_corr = float(threshold["min_corr"])
     if series.size < window or other.size < window:
@@ -187,10 +184,10 @@ class FeatureEvaluator:
 
     @staticmethod
     def evaluate_rule(
-        feature_value: Union[float, str, Sequence[Any]],
+        feature_value: float | str | Sequence[Any] | np.ndarray[Any, Any],
         op_str: str,
         threshold: Any,
-        features: Dict[str, Any] | None = None,
+        features: dict[str, Any] | None = None,
         feat_name: str | None = None,
     ) -> bool:
         """Evaluate a single feature rule against a threshold.
@@ -241,8 +238,7 @@ class FeatureEvaluator:
             if op_str == "rolling_corr":
                 if features is None or feat_name is None:
                     raise ValueError(
-                        "rolling_corr requires features and feat_name to resolve "
-                        "the 'other' series"
+                        "rolling_corr requires features and feat_name to resolve the 'other' series"
                     )
                 other_name = threshold["other"]
                 other_series = _resolve_series(features, other_name)
@@ -261,9 +257,7 @@ class FeatureEvaluator:
         raise ValueError(f"Unknown operator: {op_str}")
 
     @classmethod
-    def evaluate_compound(
-        cls, features: Dict[str, Any], rule_config: list[dict]
-    ) -> bool:
+    def evaluate_compound(cls, features: dict[str, Any], rule_config: list[dict[str, Any]]) -> bool:
         """Evaluate multiple rules against features with fail-fast short-circuit.
 
         Iterates through rules in order. Returns False immediately on first

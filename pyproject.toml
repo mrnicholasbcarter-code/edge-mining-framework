@@ -34,21 +34,24 @@ Issues = "https://github.com/mrnicholasbcarter-code/edge-mining-framework/issues
 [tool.ruff]
 line-length = 100
 target-version = "py310"
+
+[tool.ruff.lint]
 select = ["E", "F", "I", "N", "W", "UP", "B", "SIM", "RUF"]
 ignore = ["E501", "B008"]
-per-file-ignores = { "tests/*" = "S101" }
+per-file-ignores = { "tests/*" = ["S101"] }
 
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
-indent-width = 4
 line-ending = "lf"
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
 
 [tool.mypy]
-python_version = "3.10"
+# The lint job runs on Python 3.12, which is required to parse current NumPy
+# stubs. Runtime support remains >=3.10 as declared in the project metadata.
+python_version = "3.12"
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true

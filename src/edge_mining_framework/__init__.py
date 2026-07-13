@@ -1,9 +1,9 @@
 """
 Edge Mining Framework - Prediction Market Alpha Engine
 
-An agnostic signal feature evaluator and EV payout gating engine for 
-prediction markets. This library evaluates live orderbook/alpha features 
-against strict compound thresholds and mathematically blocks deployment 
+An agnostic signal feature evaluator and EV payout gating engine for
+prediction markets. This library evaluates live orderbook/alpha features
+against strict compound thresholds and mathematically blocks deployment
 unless the Expected Value (EV) exceeds friction parameters.
 
 Architecture:
@@ -40,4 +40,4 @@ from edge_mining_framework.gate import ExpectedValueGate
 
 __version__ = "0.1.0"
 __author__ = "edge-mining-framework contributors"
-__all__ = ["FeatureEvaluator", "ExpectedValueGate"]
+__all__ = ["ExpectedValueGate", "FeatureEvaluator"]
