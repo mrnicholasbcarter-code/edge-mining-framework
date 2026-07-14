@@ -25,7 +25,7 @@ classifiers = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=8.0", "pytest-asyncio>=0.24", "pytest-cov>=4.1", "ruff>=0.8", "mypy>=1.13"]
+dev = ["pytest>=8.0", "pytest-asyncio>=0.24", "pytest-cov>=4.1", "ruff>=0.8", "mypy>=1.13", "pyyaml>=6.0.1"]
 release = ["build>=1.2", "twine>=5.0"]
 
 [project.urls]
@@ -61,3 +61,7 @@ disallow_untyped_defs = true
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 asyncio_mode = "auto"
+markers = [
+    "integration: deterministic cross-package integration checks",
+    "live: opt-in network checks that are not release dependencies",
+]

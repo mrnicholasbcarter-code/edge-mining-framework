@@ -20,6 +20,7 @@ Unlike generic backtesting frameworks, the Edge Mining Framework is built from t
 ## Table of Contents
 
 - [Architecture & Execution Flow](#architecture--execution-flow)
+- [Scope and Boundaries](#scope-and-boundaries)
 - [Key Features](#key-features)
 - [Mathematical Model](#mathematical-model)
   - [Expected Value (EV) Formulation](#expected-value-ev-formulation)
@@ -70,6 +71,31 @@ sequenceDiagram
         end
     end
 ```
+
+---
+
+## Scope and Boundaries
+
+This package is a pure evaluator and expected-value gate. It accepts features
+and rules from the caller, computes deterministic decisions, and does not
+ingest market data, place orders, provide a complete feature library, or claim
+to be a backtesting engine. Integrations with those systems are explicit
+adapters so the boundary and provenance remain visible.
+
+### Installed backtest-harness adapter
+
+`examples/backtest_adapter.py` demonstrates the supported cross-repository
+boundary using the public `backtest_harness` package API. It deliberately uses
+an ordinary installed import and never mutates `sys.path` or imports sibling
+source directories:
+
+```bash
+pip install -e /path/to/backtest-harness
+pip install -e .
+python examples/backtest_adapter.py
+```
+
+The example is optional because `backtest-harness` is a separate package.
 
 ---
 
